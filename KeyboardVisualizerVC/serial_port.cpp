@@ -38,14 +38,14 @@ serial_port::~serial_port()
 //	8 data bits, no parity, one stop bit
 bool serial_port::serial_open()
 {
-    printf("SerialPort: Opening serial port %s at baud rate %d.\n", port_name, baud_rate);
+//    printf("SerialPort: Opening serial port %s at baud rate %d.\n", port_name, baud_rate);
 
 	#ifdef WIN32
 	file_descriptor = CreateFile(port_name, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
 
     if((int)file_descriptor < 0)
     {
-   	    printf("SerialPort: Port %s could not be opened: %d.\n", port_name, file_descriptor);
+   	//    printf("SerialPort: Port %s could not be opened: %d.\n", port_name, file_descriptor);
         return false;
     }
 
@@ -102,7 +102,7 @@ bool serial_port::serial_open()
 	fcntl(file_descriptor, F_SETFL, 0);
 	#endif
 
-    printf("SerialPort: Serial port %s opened successfully.\n", port_name);
+//    printf("SerialPort: Serial port %s opened successfully.\n", port_name);
     return true;
 }
 
@@ -126,7 +126,7 @@ bool serial_port::serial_open(const char* name, unsigned int baud)
 //	Closes the serial port
 void serial_port::serial_close()
 {
-    printf("SerialPort: Closing port %s.\n", port_name);
+   // printf("SerialPort: Closing port %s.\n", port_name);
 	#ifdef WIN32
 
 	#else

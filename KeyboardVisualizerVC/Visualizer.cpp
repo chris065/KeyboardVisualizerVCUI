@@ -71,7 +71,7 @@ void Visualizer::Initialize()
     
     rkb.Initialize();
 	ckb.Initialize();
-    //str.Initialize();
+    str.Initialize();
 
 	amplitude   = 100;
     avg_mode    = 0;
@@ -282,7 +282,7 @@ void Visualizer::StartThread()
 	_beginthread(thread, 0, this);
 	_beginthread(rkbthread, 0, this);
     _beginthread(ckbthread, 0, this);
-    //_beginthread(lsthread, 0, this);
+    _beginthread(lsthread, 0, this);
 }
 
 void Visualizer::DrawPattern(VISUALIZER_PATTERN pattern, int bright, vis_pixels *pixels)
@@ -567,7 +567,7 @@ void Visualizer::VisThread()
                 float brightness = bkgd_bright * (255.0f / 100.0f);
 
                 //Draw Spectrograph Foreground
-                if (y > 3)
+                if (y > 1)
                 {
                     if (fft[x] >((1 / 64.0f)*(64.0f - y)))
                     {
@@ -614,7 +614,7 @@ void Visualizer::VisThread()
                     {
                     //None
                     case 0:
-                        pixels_render->pixels[y][x] = RGB(0, 0, 0);
+                        //pixels_render->pixels[y][x] = RGB(0, 0, 0);
                         break;
 
                     //Follow Foreground
@@ -711,9 +711,9 @@ void Visualizer::LEDStripUpdateThread()
     while (TRUE)
     {
         str.SetLEDs(pixels_out->pixels);
-        if (delay < 15)
+        if (delay < 25)
         {
-            Sleep(15);
+            Sleep(25);
         }
         else
         {
