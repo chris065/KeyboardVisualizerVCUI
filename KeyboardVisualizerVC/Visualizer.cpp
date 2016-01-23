@@ -13,7 +13,7 @@
 
 RazerChroma rkb;
 CorsairKeyboard ckb;
-LEDStrip str;
+std::vector<LEDStrip *> str;
 
 //WASAPI objects
 IMMDeviceEnumerator *pMMDeviceEnumerator;
@@ -22,6 +22,10 @@ IMMDeviceCollection *pMMDeviceCollection;
 IAudioClient *pAudioClient;
 IAudioCaptureClient *pAudioCaptureClient;
 WAVEFORMATEX *waveformat;
+
+//String for LED strip port name
+char str_port[128];
+bool str_enbl = FALSE;
 
 //Thread starting static function
 static void thread(void *param)
@@ -53,6 +57,13 @@ Visualizer::Visualizer()
 
 }
 
+void Visualizer::AddLEDStrip(char* port)
+{
+    LEDStrip *newstr = new LEDStrip();
+    newstr->Initialize(port);
+    str.push_back(newstr);
+}
+
 float fft_nrml[256];
 
 void Visualizer::Initialize()
@@ -70,8 +81,7 @@ void Visualizer::Initialize()
     pAudioClient->Start();
     
     rkb.Initialize();
-	ckb.Initialize();
-    str.Initialize();
+    ckb.Initialize();    
 
 	amplitude   = 100;
     avg_mode    = 0;
@@ -521,9 +531,9 @@ void Visualizer::DrawPattern(VISUALIZER_PATTERN pattern, int bright, vis_pixels 
 
             case VISUALIZER_PATTERN_ANIM_RAINBOW_HSV:
                 {
-                    int hsv_h = ((bkgd_step + (256 - x)) % 360);
+                    int hsv_h = ((int)(bkgd_step + ((256 - x)*(360.0f/256.0f))) % 360);
                     hsv_t hsv = { hsv_h, 255, bright };
-                    pixels->pixels[y][x] = hsv2rgb(&hsv);
+                    pixels->pixels[y][255-x] = hsv2rgb(&hsv);
                 }
                 break;
 
@@ -551,7 +561,8 @@ void Visualizer::VisThread()
 		Update();
 
 		//Overflow background step
-		if (bkgd_step >= 360) bkgd_step = 0;
+		//if (bkgd_step >= 360) bkgd_step = 0;
+        bkgd_step = 10;
 
         //Draw active background
         DrawPattern(bkgd_mode, bkgd_bright, &pixels_bg);
@@ -683,7 +694,7 @@ void Visualizer::VisThread()
         }
 
 		//Increment background step
-		bkgd_step++;
+		//bkgd_step++;
 
         //Wait 15ms (~60fps)
         Sleep(15);
@@ -710,7 +721,11 @@ void Visualizer::LEDStripUpdateThread()
 {
     while (TRUE)
     {
-        str.SetLEDs(pixels_out->pixels);
+        for (int i = 0; i < str.size(); i++)
+        {
+            str[i]->SetLEDs(pixels_out->pixels);
+        }
+        
         if (delay < 25)
         {
             Sleep(25);

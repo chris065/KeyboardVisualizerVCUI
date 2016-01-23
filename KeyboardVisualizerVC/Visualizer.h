@@ -62,7 +62,10 @@ public:
 	void Update();
 
     //Draw Pattern
-    void Visualizer::DrawPattern(VISUALIZER_PATTERN pattern, int bright, vis_pixels *pixels);
+    void DrawPattern(VISUALIZER_PATTERN pattern, int bright, vis_pixels *pixels);
+
+    //Add LED strip
+    void AddLEDStrip(char* port);
 
     //Compute normalization line
     void SetNormalization(float offset, float scale);
